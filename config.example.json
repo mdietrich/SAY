@@ -1,0 +1,64 @@
+{
+	"server": "https://portal[xxx].bpo-sage.de",
+    "username": "Sage Username",
+    "password": "Sage-Password",
+    "firstname": "Max",
+    "lastname": "Mustermann",
+    "pauseStart": "11:30",
+    "pauseDuration": 30,
+    "dailyHours": 8,
+    "projects": {
+        "Company 1 - Project 1": {
+            "projectId": 1234,
+            "activityId": 10,
+            "defaultDescription": "Default task description",
+            "export": "Auftrag_1"
+        },
+        "Company 1 - Project 2": {
+            "projectId": 1235,
+            "activityId": 10,
+            "defaultDescription": "Default task description",
+            "export": "Auftrag_2"
+        },
+        "Company 2 - Project 1": {
+            "projectId": 1236,
+            "activityId": 10,
+            "defaultDescription": "Default task description",
+            "addBreak": false
+        },
+        "Company 2 - Project 2": {
+            "projectId": 1237,
+            "activityId": 10,
+            "defaultDescription": "Default task description",
+            "export": "Auftrag_2"
+        }
+    },
+    "exports": {
+        "Auftrag_1": {
+        	"type": "FI_PDF",
+            "pdfIn": "Form_to_fill_1.pdf",
+            "xmlIn": "XML_Template.xml",
+            "bestellNr": "1234",
+            "bestellPos": "00010",
+            "warenkorbNr": "20001234567",
+            "kontierungsObjekt": "Softwareprojekt 1234",
+            "kreditorenNr": "6004282",
+            "leistungArt": "Externe Beratung",
+            "leistungOrt": "Münster",
+            "leistungEmpfaenger": "max@mustermann.de"
+        },
+         "Auftrag_2": {
+         	"type": "FI_PDF",
+            "pdfIn": "Form_to_fill_1.pdf",
+            "xmlIn": "XML_Template.xml",
+            "bestellNr": "1234",
+            "bestellPos": "00010",
+            "warenkorbNr": "20001234567",
+            "kontierungsObjekt": "Softwareprojekt 1234",
+            "kreditorenNr": "6004282",
+            "leistungArt": "Externe Beratung",
+            "leistungOrt": "Münster",
+            "leistungEmpfaenger": "max@mustermann.de"
+        }
+    }
+}
