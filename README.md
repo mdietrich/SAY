@@ -1,5 +1,5 @@
 # SAY - Sage Automator Yak
-[![License: MIT](https://img.shields.io/github/license/mdietrich/say)](https://mit-license.org/) <img src="https://komarev.com/ghpvc/?username=mdietrich" alt=""/>
+[![License: MIT](https://img.shields.io/github/license/mdietrich/SAY)](https://mit-license.org/) <img src="https://komarev.com/ghpvc/?username=mdietrich" alt=""/>
 
 <div align="center">
     <img src="images/yak.png" alt="Yak" width="250" height="250" /><br />
@@ -31,7 +31,7 @@ To get a local copy up and running follow these steps.
 
 You need:
 
-* Java Runtime Environment 8
+* Java Runtime Environment
 * Apache Maven or
 * A binary JAR of this project
 
@@ -79,13 +79,13 @@ export | Name of the export (see below) to use for that project
 addBreak | This is true by default. If set to false, no break will be added for that project. This is useful for sparetime or holiday-Projects
 
 **Exports configuration**
-	
+
 Parameter | Meaning
 --- | ---
 type | Type of export mechanism to use.
-	
+
 All other parameters depend on the exporter used. Acutally there is only one supported exporter "FI_PDF" with the following additional parameters.
-	
+
 Parameter | Meaning
 --- | ---
 pdfIn | Name of the PDF to fill with xmlIn data, located in the folder export/in
@@ -98,7 +98,7 @@ kreditorenNr | Datafield to fill in typical source xml
 leistungArt | Datafield to fill in typical source xml
 leistungOrt | Datafield to fill in typical source xml
 leistungEmpfaenger | Datafield to fill in typical source xml
-	
+
 ## Usage
 
 ### Start The App
@@ -146,7 +146,7 @@ The values from the `projectId` fields of the `config.json` file must be present
 
 ### Get Project Details
 
-This reads detail information for a given project ID. 
+This reads detail information for a given project ID.
 The values from the `activityId` fields of the `config.json` file must be present in this list. For the initial configuration, the values for the activities can be taken from this list. The IDs visible in the Sage frontend differ from these.
 
 `project [projectId]`

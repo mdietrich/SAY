@@ -38,3 +38,5 @@ config.json
 *.pdf
 *.xml
 *.log
+/release
+*.jar
