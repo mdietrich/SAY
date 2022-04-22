@@ -264,10 +264,15 @@ public class SageService {
 		if (!loggedIn) {
 			this.login();
 		}
+		if(this.user == null) {
+			this.getUserData();
+		}
 
 		List<Project> projects = new ArrayList<Project>();
 		String url = configService.getConfig().getServer() + this.apiProjects
-				+ "?options%5BSkip%5D=0&options%5BTake%5D=50&options%5BSort%5D%5B0%5D%5BPropertyName%5D=Name&options%5BSort%5D%5B0%5D%5BOrderDirection%5D=Ascending&projectmember%5BAnNr%5D=7243&projectmember%5BMdNr%5D=6122&date="
+				+ "?options%5BSkip%5D=0&options%5BTake%5D=50&options%5BSort%5D%5B0%5D%5BPropertyName%5D=Name&options%5BSort"
+				+ "%5D%5B0%5D%5BOrderDirection%5D=Ascending&projectmember%5BAnNr%5D="+this.user.getEmployeeKey().getAnNr()
+				+ "&projectmember%5BMdNr%5D="+this.user.getEmployeeKey().getMdNr()+"&date="
 				+ LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01T00%3A00%3A00&filterOnProjectDescription=true&_="
 				+ Instant.now().getEpochSecond() + "000";
 		String json = "";
@@ -316,7 +321,8 @@ public class SageService {
 
 		List<ProjectUnit> projectUnits = new ArrayList<ProjectUnit>();
 		String dateFormatted = DateTimeFormatter.ofPattern("YYYY-MM-dd").format(ZonedDateTime.now());
-		String url = configService.getConfig().getServer() + this.apiProjectUnits + "?projectId=" + projectId + "&dimension=0&date=" + dateFormatted + "T00%3A00%3A00&parentUnitId=" + projectId + "&_=" + Instant.now().getEpochSecond();
+		String url = configService.getConfig().getServer() + this.apiProjectUnits + "?projectId=" + projectId + "&dimension=0&date="
+				+ dateFormatted + "T00%3A00%3A00&parentUnitId=" + projectId + "&_=" + Instant.now().getEpochSecond();
 		String json;
 		try {
 			json = requestService.getPage(url);
