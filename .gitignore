@@ -36,7 +36,7 @@ build/
 .DS_Store
 config.json
 *.pdf
-*.xml
+/export/in/*.xml
 *.log
 /release
 *.jar

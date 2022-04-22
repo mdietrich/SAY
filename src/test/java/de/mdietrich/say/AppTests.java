@@ -1,4 +1,4 @@
-package de.mdietrich.yaso;
+package de.mdietrich.say;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
