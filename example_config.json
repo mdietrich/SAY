@@ -1,5 +1,5 @@
 {
-	"server": "https://portal[xxx].bpo-sage.de",
+	"server": "https://portal142076250.bpo-sage.de",
     "username": "Sage Username",
     "password": "Sage-Password",
     "firstname": "Max",
@@ -7,6 +7,7 @@
     "pauseStart": "11:30",
     "pauseDuration": 30,
     "dailyHours": 8,
+    "importer": "simpleCsvImporter",
     "projects": {
         "Company 1 - Project 1": {
             "projectId": 1234,

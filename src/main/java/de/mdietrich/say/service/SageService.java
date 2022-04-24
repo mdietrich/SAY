@@ -84,7 +84,7 @@ public class SageService {
 	private final String apiProjectTime = "/hrportalapi/Time/Project/ProjectTime";
 	private final String apiProjectTimeDelete = "/hrportalapi/Time/Project/ProjectTime";
 
-	private Map<String, ExporterInterface> exporterMap = new HashMap<String, ExporterInterface>();
+	private final Map<String, ExporterInterface> exporterMap = new HashMap<String, ExporterInterface>();
 
 	/**
 	 * Defines which exporter gets used for defined "exports" in config.json and
@@ -746,7 +746,8 @@ public class SageService {
 	 */
 	public void importExternalData(String data) {
 		// read csv
-		List<SayTimetableImportRow> importRowList = importService.read(data);
+		String importer = this.configService.getConfig().getImporter();
+		List<SayTimetableImportRow> importRowList = importService.readCsv(importer, data);
 		if (importRowList.size() == 0)
 			return;
 

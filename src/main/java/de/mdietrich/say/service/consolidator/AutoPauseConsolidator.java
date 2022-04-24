@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import de.mdietrich.say.service.TimeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class AutoPauseConsolidator implements ConsolidatorInterface {
 
 	@Autowired
 	private ConfigService configService;
+
+	@Autowired
+	private TimeService timeService;
 
 	Logger logger = LoggerFactory.getLogger(AutoPauseConsolidator.class);
 
@@ -65,15 +69,10 @@ public class AutoPauseConsolidator implements ConsolidatorInterface {
 		return project.getActivityId();
 	}
 
-	private LocalTime timeStringToTime(String time) {
-		int timeH = Integer.valueOf(time.split(":")[0]);
-		int timeM = Integer.valueOf(time.split(":")[1]);
-		LocalTime t = LocalTime.of(timeH, timeM);
-		return t;
-	}
+
 
 	private String addHoursToTime(String time, BigDecimal hours) {
-		LocalTime t = timeStringToTime(time);
+		LocalTime t = timeService.timeStringToTime(time);
 
 		String[] hoursParts = hours.toString().split("[.]");
 		long hoursH = Long.valueOf(hoursParts[0]);
@@ -87,31 +86,12 @@ public class AutoPauseConsolidator implements ConsolidatorInterface {
 		return newTime;
 	}
 
-	private String addHoursToDateTime(String dateTime, BigDecimal hours) {
-		String time = dateTime.substring(11, 16);
-		LocalTime t = timeStringToTime(time);
 
-		String[] hoursParts = hours.toString().split("[.]");
-		long hoursH = Long.valueOf(hoursParts[0]);
-		BigDecimal hoursMBigDecimal = hours.subtract(new BigDecimal(hoursH));
-		long hoursM = hoursMBigDecimal.multiply(new BigDecimal(60)).longValue();
-		t = t.plusHours(hoursH);
-		t = t.plusMinutes(hoursM);
-
-		String newTime = dateTime.substring(0, 10) + "T" + t.toString() + ":00";
-
-		return newTime;
-	}
-
-	private Boolean isTimeABeforeTimeB(String timeA, String timeB) {
-		LocalTime tA = timeStringToTime(timeA);
-		LocalTime tB = timeStringToTime(timeB);
-		return tA.isBefore(tB);
-	}
 
 	private Boolean shouldHaveBreak(String begin, String end) {
 		String breakStart = this.configService.getConfig().getPauseStart();
-		if (isTimeABeforeTimeB(begin.substring(11, 16), breakStart) && isTimeABeforeTimeB(breakStart, end.substring(11, 16))) {
+		if (timeService.isTimeABeforeTimeB(begin.substring(11, 16), breakStart)
+				&& timeService.isTimeABeforeTimeB(breakStart, end.substring(11, 16))) {
 			return true;
 		}
 		return false;
@@ -123,7 +103,7 @@ public class AutoPauseConsolidator implements ConsolidatorInterface {
 		existingEntry.setAmountHours(existingEntry.getAmountHours().add(newEntry.getAmountHours()));
 
 		// update end
-		String newEnd = this.addHoursToDateTime(existingEntry.getEnd(), newEntry.getAmountHours());
+		String newEnd = timeService.addHoursToDateTime(existingEntry.getEnd(), newEntry.getAmountHours());
 		existingEntry.setEnd(newEnd);
 
 		// update remarks
@@ -178,7 +158,7 @@ public class AutoPauseConsolidator implements ConsolidatorInterface {
 			if (!lastEnd.equals("")) {
 				// fix times
 				String begin = lastEnd;
-				String end = this.addHoursToDateTime(begin, entry.getAmountHours());
+				String end = timeService.addHoursToDateTime(begin, entry.getAmountHours());
 				lastEnd = end;
 				entry.setBegin(begin);
 				entry.setEnd(end);
@@ -206,7 +186,7 @@ public class AutoPauseConsolidator implements ConsolidatorInterface {
 					entry.setBreakAmountMinutes(breakDurationMinutes);
 
 					// fix end
-					String end = this.addHoursToDateTime(entry.getEnd(), breakDurationHours);
+					String end = timeService.addHoursToDateTime(entry.getEnd(), breakDurationHours);
 					entry.setEnd(end);
 					dayHasBreak = true;
 
@@ -216,8 +196,8 @@ public class AutoPauseConsolidator implements ConsolidatorInterface {
 
 			} else {
 				// fix times of following project on that day after break
-				String begin = this.addHoursToDateTime(entry.getBegin(), breakDurationHours);
-				String end = this.addHoursToDateTime(entry.getEnd(), breakDurationHours);
+				String begin = timeService.addHoursToDateTime(entry.getBegin(), breakDurationHours);
+				String end = timeService.addHoursToDateTime(entry.getEnd(), breakDurationHours);
 				entry.setBegin(begin);
 				entry.setEnd(end);
 			}

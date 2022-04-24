@@ -23,8 +23,17 @@ public class Configuration {
 	private String firstname;
 	private String lastname;
 	private int dailyHours;
+	private String importer;
 	private Map<String, Project> projects;
 	private Map<String, Export> exports;
+
+	public String getImporter() {
+		return importer;
+	}
+
+	public void setImporter(String importer) {
+		this.importer = importer;
+	}
 
 	public String getUsername() {
 		return username;
@@ -106,12 +115,6 @@ public class Configuration {
 		this.server = server;
 	}
 
-	@Override
-	public String toString() {
-		return "Configuration [server=" + server + ", username=" + username + ", password=" + password + ", pauseStart=" + pauseStart + ", pauseDuration=" + pauseDuration + ", firstname=" + firstname + ", lastname=" + lastname
-				+ ", dailyHours=" + dailyHours + ", projects=" + projects + ", exports=" + exports + "]";
-	}
-
 	public Project getProjectForProjectId(int projectId) {
 		for (Map.Entry<String, Project> projectMap : this.getProjects().entrySet()) {
 			if (projectMap.getValue().getProjectId() == projectId) {
@@ -122,4 +125,20 @@ public class Configuration {
 		return null;
 	}
 
+	@Override
+	public String toString() {
+		return "Configuration{" +
+				"server='" + server + '\'' +
+				", username='" + username + '\'' +
+				", password='" + password + '\'' +
+				", pauseStart='" + pauseStart + '\'' +
+				", pauseDuration='" + pauseDuration + '\'' +
+				", firstname='" + firstname + '\'' +
+				", lastname='" + lastname + '\'' +
+				", dailyHours=" + dailyHours +
+				", importer='" + importer + '\'' +
+				", projects=" + projects +
+				", exports=" + exports +
+				'}';
+	}
 }

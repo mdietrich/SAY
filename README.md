@@ -48,7 +48,7 @@ If you have a binary jar file, you are ready to import CSV data right away. If t
 
 ### Configuration
 
-The cloned project folder includes a [config.example.json](./config.example.json) file you should copy to `config.json` and change to your needs:
+The cloned project folder includes a [example_config.json](./example_config.json) file you should copy to `config.json` and change to your needs:
 
 **config.json**
 
@@ -62,6 +62,7 @@ lastname | Your lastname
 pauseStart | Time of day when your pause should start
 pauseDuration | Usual pause duration
 dailyHours | Your daily working hours
+importer | Importer to use for "import" function. See "Import CSV"
 projects | Your project configuraiton
 exports | Configuraiton of your exports
 
@@ -160,6 +161,27 @@ This imports the given CSV file into Sage. Yak automatically removes unnecessary
 `import [filename]`
 
 ![Import](images/say_import.png)
+
+Über den "importer"-Konfigurationseintrag kann zwischen folgenden Importern gewählt werden:
+- simpleCsvImporter
+- timematorCsvImporter
+
+The following importers can be selected via the "importer" configuration entry:
+- simpleCsvImporter
+- timematorCsvImporter
+
+The **simpleCsvImporter** uses a simple structure to import the values. Details can be found in the example file "example_simple.csv".
+
+The **timematorCsvImporter** uses the CSV export structure including notes:
+
+<div align="left">
+    <img src="images/timemator_export.png" alt="Yak" width="50%" /><br />
+	 <br />
+    A Sage automator tool written in Java.
+</div>
+
+Details can be found in the example file "example_timemator.csv".
+
 
 ### Read Timetable From Sage
 

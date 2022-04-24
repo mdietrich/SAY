@@ -1,7 +1,5 @@
 package de.mdietrich.say;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +13,8 @@ import de.mdietrich.say.entity.sage.Timetable;
 import de.mdietrich.say.entity.sage.TimetableEntry;
 import de.mdietrich.say.entity.sage.User;
 import de.mdietrich.say.service.SageService;
+
+import java.util.List;
 
 
 @ShellComponent
@@ -34,48 +34,48 @@ public class ShellCommands {
 	}
 
 	@ShellMethod("Read projects for configured user")
-	public String projects(@ShellOption(defaultValue = "") String username, @ShellOption(defaultValue = "") String password) {
-		String result = "";
+	public String projects() {
+		StringBuilder result = new StringBuilder();
 		List<Project> projects = sageService.getProjects();
 		if (projects.size() > 0) {
-			result += "\nAvailable projects:\n";
+			result.append("\nAvailable projects:\n");
 			for (Project project : projects) {
-				result += "ProjectId " + project.getId() + " - " + project.getName() + "\n";
+				result.append("ProjectId ").append(project.getId()).append(" - ").append(project.getName()).append("\n");
 			}
 		} else {
-			result += "\nNo projects found.\n";
+			result.append("\nNo projects found.\n");
 		}
-		return result;
+		return result.toString();
 	}
 
 	@ShellMethod("Read project details for given project id")
 	public String project(@ShellOption int projectId) {
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		List<ProjectUnit> projectUnits = sageService.getProjectUnits(projectId);
 		if (projectUnits.size() > 0) {
 			System.out.println("\nAvailable project units:\n");
 			for (ProjectUnit projectUnit : projectUnits) {
-				result += "Unit " + projectUnit.getId() + " - " + projectUnit.getName() + "\n";
+				result.append("Unit ").append(projectUnit.getId()).append(" - ").append(projectUnit.getName()).append("\n");
 			}
 		} else {
-			result += "\nNo project units found.\n";
+			result.append("\nNo project units found.\n");
 		}
-		return result;
+		return result.toString();
 	}
 
 	@ShellMethod("Read timetable for given month (YYYY-MM)")
 	public String timetable(@ShellOption String date) {
-		String result = "";
+		StringBuilder result = new StringBuilder();
 
 		Timetable timetable = sageService.getTimeTable(date);
 		if (timetable == null) {
 			return "Error";
 		}
 		for (TimetableEntry timetableEntry : timetable.getTimetableEntries()) {
-			result += "\nBookingId " + timetableEntry.getBuchungsId() + " - " + timetableEntry.getDay() + " - " + timetableEntry.getAmountMinutes() + " Min.: " + timetableEntry.getProject().getName() + " - " + timetableEntry.getRemark();
+			result.append("\nBookingId ").append(timetableEntry.getBuchungsId()).append(" - ").append(timetableEntry.getDay()).append(" - ").append(timetableEntry.getAmountMinutes()).append(" Min.: ").append(timetableEntry.getProject().getName()).append(" - ").append(timetableEntry.getRemark());
 		}
 
-		return result;
+		return result.toString();
 	}
 
 	@ShellMethod(key = "import", value = "Import data from csv")

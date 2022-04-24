@@ -39,5 +39,7 @@ config.json
 *.log
 *.jar
 *.sh
+*.bat
 /release
+/testdata
 /export/in/*.xml
