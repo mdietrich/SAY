@@ -84,7 +84,7 @@ public class SageService {
 	private final String apiProjectTime = "/hrportalapi/Time/Project/ProjectTime";
 	private final String apiProjectTimeDelete = "/hrportalapi/Time/Project/ProjectTime";
 
-	private final Map<String, ExporterInterface> exporterMap = new HashMap<String, ExporterInterface>();
+	private final Map<String, ExporterInterface> exporterMap = new HashMap<>();
 
 	/**
 	 * Defines which exporter gets used for defined "exports" in config.json and
@@ -99,8 +99,8 @@ public class SageService {
 	 * Find the day number of the last day in the month of given date String in
 	 * format YYYY-MM-DD
 	 * 
-	 * @param date
-	 * @return
+	 * @param date Format YYYY-MM-DD
+	 * @return Day of month
 	 */
 	private int findLastDayOfMonth(String date) {
 		if (!date.matches("(\\d{4})-(\\d{2})")) {
@@ -110,14 +110,13 @@ public class SageService {
 		date = date + "-01";
 		LocalDate givenDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 		LocalDate lastDayOfMonthDateGivenDate = givenDate.withDayOfMonth(givenDate.getMonth().length(givenDate.isLeapYear()));
-		int lastDayOfMonth = lastDayOfMonthDateGivenDate.getDayOfMonth();
-		return lastDayOfMonth;
+		return lastDayOfMonthDateGivenDate.getDayOfMonth();
 	}
 
 	/**
 	 * Login to sage portal and api
 	 * 
-	 * @return
+	 * @return Success of login
 	 */
 	public Boolean login() {
 		logger.debug("Logging in...");
@@ -177,11 +176,11 @@ public class SageService {
 		String[] rows = script.split("\n");
 		String key = "";
 		for (String row : rows) {
-			if (row.strip().length() >= 4 && row.strip().substring(0, 4).equals("key:")) {
+			if (row.strip().length() >= 4 && row.strip().startsWith("key:")) {
 				key = row.split(":")[1].replace("'", "").replace(",", "").trim();
 			}
 		}
-		if (key == "") {
+		if (key.equals("")) {
 			logger.error("Could not find session key after login.");
 			this.loggedIn = false;
 			return false;
@@ -219,7 +218,7 @@ public class SageService {
 	/**
 	 * Get sage user data
 	 * 
-	 * @return
+	 * @return User
 	 */
 	public User getUserData() {
 		logger.debug("Getting user data...");
@@ -256,7 +255,7 @@ public class SageService {
 	/**
 	 * Get sage projects
 	 * 
-	 * @return
+	 * @return Project list
 	 */
 	public List<Project> getProjects() {
 		logger.debug("Getting projects...");
@@ -268,14 +267,14 @@ public class SageService {
 			this.getUserData();
 		}
 
-		List<Project> projects = new ArrayList<Project>();
+		List<Project> projects = new ArrayList<>();
 		String url = configService.getConfig().getServer() + this.apiProjects
 				+ "?options%5BSkip%5D=0&options%5BTake%5D=50&options%5BSort%5D%5B0%5D%5BPropertyName%5D=Name&options%5BSort"
 				+ "%5D%5B0%5D%5BOrderDirection%5D=Ascending&projectmember%5BAnNr%5D="+this.user.getEmployeeKey().getAnNr()
 				+ "&projectmember%5BMdNr%5D="+this.user.getEmployeeKey().getMdNr()+"&date="
 				+ LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM")) + "-01T00%3A00%3A00&filterOnProjectDescription=true&_="
 				+ Instant.now().getEpochSecond() + "000";
-		String json = "";
+		String json;
 		try {
 			json = requestService.getPage(url);
 		} catch (UnauthorizedException e1) {
@@ -289,7 +288,7 @@ public class SageService {
 				for (JsonNode jsonProject : jsonProjects) {
 					// build project object
 					ObjectMapper mapper = new ObjectMapper();
-					Project project = null;
+					Project project;
 					try {
 						project = mapper.readValue(jsonProject.toString(), Project.class);
 					} catch (JsonProcessingException e) {
@@ -309,8 +308,8 @@ public class SageService {
 	/**
 	 * Get sage prject units
 	 * 
-	 * @param projectId
-	 * @return
+	 * @param projectId Project ID
+	 * @return List of Projectunits
 	 */
 	public List<ProjectUnit> getProjectUnits(int projectId) {
 		logger.debug("Getting activities for project id " + projectId + "...");
@@ -319,7 +318,7 @@ public class SageService {
 			this.login();
 		}
 
-		List<ProjectUnit> projectUnits = new ArrayList<ProjectUnit>();
+		List<ProjectUnit> projectUnits = new ArrayList<>();
 		String dateFormatted = DateTimeFormatter.ofPattern("YYYY-MM-dd").format(ZonedDateTime.now());
 		String url = configService.getConfig().getServer() + this.apiProjectUnits + "?projectId=" + projectId + "&dimension=0&date="
 				+ dateFormatted + "T00%3A00%3A00&parentUnitId=" + projectId + "&_=" + Instant.now().getEpochSecond();
@@ -350,8 +349,8 @@ public class SageService {
 	/**
 	 * Get sage time table for given date in format YYYY-MM-DD
 	 * 
-	 * @param date
-	 * @return
+	 * @param date Date in Format YYYY-MM-DD
+	 * @return Timetable
 	 */
 	public Timetable getTimeTable(String date) {
 		logger.debug("Getting timetable for month " + date + "...");
@@ -411,9 +410,9 @@ public class SageService {
 	/**
 	 * Find sage project unit for given projectId and activityId
 	 * 
-	 * @param projectId
-	 * @param activityId
-	 * @return
+	 * @param projectId Project Id
+	 * @param activityId Activity ID
+	 * @return ProjectUnit
 	 */
 	private ProjectUnit findProjectUnitForProjectAndActivityId(int projectId, int activityId) {
 		List<ProjectUnit> projectUnits = this.getProjectUnits(projectId);
@@ -430,8 +429,8 @@ public class SageService {
 	/**
 	 * Build sage project time from say timetable entry
 	 * 
-	 * @param sayTimetableEntry
-	 * @return
+	 * @param sayTimetableEntry Say timetable entry
+	 * @return ProjectTime
 	 */
 	private ProjectTime buildProjectTimeFromSayTimetableEntry(SayTimetableEntry sayTimetableEntry) {
 		// make sure we have a session
@@ -478,8 +477,8 @@ public class SageService {
 	/**
 	 * Save project time to sage
 	 * 
-	 * @param sayTimetableEntry
-	 * @return
+	 * @param sayTimetableEntry Say timetable entry
+	 * @return Success
 	 */
 	private Boolean addProjectTime(SayTimetableEntry sayTimetableEntry) {
 
@@ -502,14 +501,13 @@ public class SageService {
 			logger.error("Could not parse json");
 			return false;
 		}
-		String html = "";
 		try {
-			html = requestService.putPage(url, BodyPublishers.ofString(json), 200, "application/json");
+			String html = requestService.putPage(url, BodyPublishers.ofString(json), 200, "application/json");
+			logger.debug(html);
 		} catch (UnauthorizedException e1) {
 			this.loggedIn = false;
 			return this.addProjectTime(sayTimetableEntry);
 		}
-		logger.debug(html);
 
 		return true;
 	}
@@ -517,8 +515,8 @@ public class SageService {
 	/**
 	 * Delete project time from sage
 	 * 
-	 * @param projectTimeId
-	 * @return
+	 * @param projectTimeId Project time ID to delete
+	 * @return Success
 	 */
 	private Boolean deleteProjectTime(int projectTimeId) {
 		logger.debug("Deleting project Time...");
@@ -543,9 +541,9 @@ public class SageService {
 	/**
 	 * Remove all project times for given day from sage
 	 * 
-	 * @param timetable
-	 * @param day
-	 * @return
+	 * @param timetable Timetable
+	 * @param day Day to delete
+	 * @return success
 	 */
 	private Boolean removeProjectTimeForDay(Timetable timetable, String day) {
 
@@ -582,7 +580,7 @@ public class SageService {
 	/**
 	 * Remove all project times for month with given date (YYYY-MM-DD) from sage
 	 * 
-	 * @param date
+	 * @param date Month to delete (YYYY-MM-DD)
 	 */
 	public void removeProjectTimeForMonth(String date) {
 		Timetable sageTimetable = this.getTimeTable(date);
@@ -597,9 +595,9 @@ public class SageService {
 	/**
 	 * Find new say entries missing in sage
 	 * 
-	 * @param sageTimetable
-	 * @param sayTimetable
-	 * @return
+	 * @param sageTimetable Sage timetable
+	 * @param sayTimetable SAY timetable
+	 * @return List of new SAY entries
 	 */
 	private List<SayTimetableEntry> findNewSayEntries(Timetable sageTimetable, SayTimetable sayTimetable) {
 
@@ -611,7 +609,7 @@ public class SageService {
 			for (SayTimetableEntry sayEntry : sayEntryList) {
 
 				// iterate over sage entries
-				Boolean entryExists = false;
+				boolean entryExists = false;
 				if (sageTimetable == null) {
 					return null;
 				}
@@ -643,15 +641,15 @@ public class SageService {
 	/**
 	 * Find obsolete entries in sage
 	 * 
-	 * @param sageTimetable
-	 * @param sayTimetable
-	 * @return
+	 * @param sageTimetable Sage timetable
+	 * @param sayTimetable SAY timetable
+	 * @return List of obsolete Sage days
 	 */
 	private List<String> findObsoleteSageEntryDays(Timetable sageTimetable, SayTimetable sayTimetable) {
 		List<String> days = new ArrayList<>();
 		for (TimetableEntry sageEntry : sageTimetable.getTimetableEntries()) {
 			// check each sage entry for say entry
-			Boolean sayEntryExists = false;
+			boolean sayEntryExists = false;
 			for (Entry<String, List<SayTimetableEntry>> sayDay : sayTimetable.getDays().entrySet()) {
 				// check if say entry exists
 				if (sayDay.getKey().equals(sageEntry.getDay().substring(0, 10))) {
@@ -687,9 +685,9 @@ public class SageService {
 	/**
 	 * Check if Sage timetable has entries for day
 	 * 
-	 * @param sageTimetable
-	 * @param day
-	 * @return
+	 * @param sageTimetable Sage timetable
+	 * @param day Day (YYYY-MM-DD)
+	 * @return Result
 	 */
 	private Boolean sageHasEntryForDay(Timetable sageTimetable, String day) {
 		for (TimetableEntry entry : sageTimetable.getTimetableEntries()) {
@@ -703,12 +701,12 @@ public class SageService {
 	/**
 	 * Write say timetable to sage an fix differences
 	 * 
-	 * @param sageTimetable
-	 * @param sayTimetable
+	 * @param sageTimetable Sage timetable
+	 * @param sayTimetable SAY timetable
 	 */
 	private void writeTimetableToSage(Timetable sageTimetable, SayTimetable sayTimetable) {
 
-		List<SayTimetableEntry> newSayEntries = new ArrayList<>();
+		List<SayTimetableEntry> newSayEntries;
 
 		// find days with obsolete entries
 		List<String> days = this.findObsoleteSageEntryDays(sageTimetable, sayTimetable);
@@ -742,7 +740,7 @@ public class SageService {
 	/**
 	 * Import external data (eg. from csv)
 	 * 
-	 * @param data
+	 * @param data Data to import
 	 */
 	public void importExternalData(String data) {
 		// read csv
@@ -765,8 +763,8 @@ public class SageService {
 	/**
 	 * Build map of exports with list of timetable entries
 	 * 
-	 * @param timetable
-	 * @return
+	 * @param timetable timetable
+	 * @return Export lists
 	 */
 	private Map<String, List<TimetableEntry>> buildExportLists(Timetable timetable) {
 		Map<String, List<TimetableEntry>> exportEntryMap = new HashMap<>();
@@ -788,7 +786,7 @@ public class SageService {
 	/**
 	 * Export timetable data for external accounting
 	 * 
-	 * @param timetable
+	 * @param timetable Timetable to export
 	 */
 	public void exportTimetable(Timetable timetable) {
 		Map<String, List<TimetableEntry>> exportList = this.buildExportLists(timetable);

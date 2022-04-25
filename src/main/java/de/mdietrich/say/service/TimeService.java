@@ -17,8 +17,7 @@ public class TimeService {
 	public LocalTime timeStringToTime(String time) {
 		int timeH = Integer.parseInt(time.split(":")[0]);
 		int timeM = Integer.parseInt(time.split(":")[1]);
-		LocalTime t = LocalTime.of(timeH, timeM);
-		return t;
+		return LocalTime.of(timeH, timeM);
 	}
 
 	public String addHoursToDateTime(String dateTime, BigDecimal hours) {
@@ -31,10 +30,7 @@ public class TimeService {
 		long hoursM = hoursMBigDecimal.multiply(new BigDecimal(60)).longValue();
 		t = t.plusHours(hoursH);
 		t = t.plusMinutes(hoursM);
-
-		String newTime = dateTime.substring(0, 10) + "T" + t.toString() + ":00";
-
-		return newTime;
+		return dateTime.substring(0, 10) + "T" + t.toString() + ":00";
 	}
 
 	public Boolean isTimeABeforeTimeB(String timeA, String timeB) {
@@ -46,7 +42,7 @@ public class TimeService {
 	public BigDecimal calculateHoursDuration(String timeFrom, String timeTo) {
 		LocalTime from = timeStringToTime(timeFrom);
 		LocalTime to = timeStringToTime(timeTo);
-		Long minutes = Duration.between(from, to).toMinutes();
+		long minutes = Duration.between(from, to).toMinutes();
 		return new BigDecimal(minutes).divide(new BigDecimal(60), 2, RoundingMode.HALF_UP);
 	}
 
@@ -54,17 +50,17 @@ public class TimeService {
 		StringBuilder result = new StringBuilder();
 		if(date.length() == 8) {
 			result.append("20")
-				.append(date.substring(6, 8))
+				.append(date, 6, 8)
 				.append("-")
-				.append(date.substring(3, 5))
+				.append(date, 3, 5)
 				.append("-")
-				.append(date.substring(0, 2));
+				.append(date, 0, 2);
 		} else if(date.length() == 10) {
-			result.append(date.substring(6,10))
+			result.append(date, 6, 10)
 				.append("-")
-				.append(date.substring(3, 5))
+				.append(date, 3, 5)
 				.append("-")
-				.append(date.substring(0, 2));
+				.append(date, 0, 2);
 		} else {
 			logger.error("Unsupported date format '" + date +"'");
 		}

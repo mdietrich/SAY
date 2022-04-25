@@ -13,7 +13,6 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 
 import javax.annotation.PostConstruct;
-import javax.security.sasl.AuthenticationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,7 @@ public class RequestService {
 	Logger logger = LoggerFactory.getLogger(RequestService.class);
 
 	private HttpClient httpClient;
-	private int timeoutSeconds = 60;
+	private final int timeoutSeconds = 60;
 
 	@PostConstruct
 	private void initHttpClient() {
@@ -43,34 +42,31 @@ public class RequestService {
 	/**
 	 * Request caller
 	 * 
-	 * @param request
-	 * @param expectedStatusCode
-	 * @return
-	 * @throws AuthenticationException
+	 * @param request Request object
+	 * @param expectedStatusCode Expected status code
+	 * @return page response body
+	 * @throws UnauthorizedException Sage Authentication Error
 	 */
 	private String callPage(HttpRequest request, int expectedStatusCode) throws UnauthorizedException {
-		String result = "";
+		String result;
 		HttpResponse<String> response = null;
 		try {
 			response = this.httpClient.send(request, BodyHandlers.ofString());
 
-		} catch (IOException e) {
-			logger.error("Could not send request.");
-			e.printStackTrace();
-		} catch (InterruptedException e) {
+		} catch (IOException | InterruptedException e) {
 			logger.error("Could not send request.");
 			e.printStackTrace();
 		}
 
-		if (response.statusCode() != expectedStatusCode) {
-			if (response.statusCode() == 401) {
+		if ((response != null ? response.statusCode() : 0) != expectedStatusCode) {
+			if ((response != null ? response.statusCode() : 0) == 401) {
 				throw new UnauthorizedException(response.body());
 			}
-			logger.error("Got status code " + response.statusCode() + " but expected " + expectedStatusCode);
-			logger.error(response.body());
+			logger.error("Got status code " + (response != null ? response.statusCode() : 0) + " but expected " + expectedStatusCode);
+			logger.error(response != null ? response.body() : null);
 			return null;
 		}
-		result = response.body();
+		result = response != null ? response.body() : null;
 
 		return result;
 	}
@@ -78,10 +74,10 @@ public class RequestService {
 	/**
 	 * Sage get request
 	 * 
-	 * @param url
-	 * @param expectedStatusCode
-	 * @return
-	 * @throws AuthenticationException
+	 * @param url Url to get
+	 * @param expectedStatusCode Expected status code
+	 * @return page body
+	 * @throws UnauthorizedException Sage authorization Error
 	 */
 	public String getPage(String url, int expectedStatusCode) throws UnauthorizedException {
 		logger.debug("Getting " + url + " ...");
@@ -99,9 +95,9 @@ public class RequestService {
 	/**
 	 * Sage get request (200)
 	 * 
-	 * @param url
-	 * @return
-	 * @throws AuthenticationException
+	 * @param url Url to get
+	 * @return Page Body
+	 * @throws UnauthorizedException Sage authorization exception
 	 */
 	public String getPage(String url) throws UnauthorizedException {
 		int expectedStatusCode = 200;
@@ -111,12 +107,12 @@ public class RequestService {
 	/**
 	 * Sage post request
 	 * 
-	 * @param url
-	 * @param bodyPublisher
-	 * @param expectedStatusCode
-	 * @param contentType
-	 * @return
-	 * @throws AuthenticationException
+	 * @param url Url to post
+	 * @param bodyPublisher Bodypublisher
+	 * @param expectedStatusCode Expected Status code
+	 * @param contentType Content-Type
+	 * @return Page body
+	 * @throws UnauthorizedException Sage authorization exception
 	 */
 	public String postPage(String url, BodyPublisher bodyPublisher, int expectedStatusCode, String contentType) throws UnauthorizedException {
 		logger.debug("Posting " + url + " ...");
@@ -134,12 +130,12 @@ public class RequestService {
 	/**
 	 * Sage put request
 	 * 
-	 * @param url
-	 * @param bodyPublisher
-	 * @param expectedStatusCode
-	 * @param contentType
-	 * @return
-	 * @throws AuthenticationException
+	 * @param url Url to Put
+	 * @param bodyPublisher BodyPublisher
+	 * @param expectedStatusCode Expected status code
+	 * @param contentType Content-Type
+	 * @return Page body
+	 * @throws UnauthorizedException Sage authorization exception
 	 */
 	public String putPage(String url, BodyPublisher bodyPublisher, int expectedStatusCode, String contentType) throws UnauthorizedException {
 		logger.debug("Putting " + url + " ...");
@@ -157,22 +153,19 @@ public class RequestService {
 	/**
 	 * Sage delete request
 	 * 
-	 * @param url
-	 * @param expectedStatusCode
-	 * @param contentType
-	 * @return
-	 * @throws AuthenticationException
+	 * @param url URL to delete
+	 * @param expectedStatusCode Expected status code
+	 * @param contentType Content-Type
+	 * @throws UnauthorizedException Sage authorization exception
 	 */
-	public String deletePage(String url, int expectedStatusCode, String contentType) throws UnauthorizedException {
+	public void deletePage(String url, int expectedStatusCode, String contentType) throws UnauthorizedException {
 		logger.debug("Deleting " + url + " ...");
-		String result = "";
 		try {
 			HttpRequest request = HttpRequest.newBuilder(new URI(url)).DELETE().headers("Content-Type", contentType).build();
-			result = this.callPage(request, expectedStatusCode);
+			this.callPage(request, expectedStatusCode);
 		} catch (URISyntaxException e) {
 			logger.error("Could not build http request");
 			e.printStackTrace();
 		}
-		return result;
 	}
 }

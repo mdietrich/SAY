@@ -7,5 +7,5 @@ import de.mdietrich.say.entity.sage.TimetableEntry;
 
 public interface ExporterInterface {
 
-	public void export(List<TimetableEntry> entryList, Export exportConfiguration);
+	void export(List<TimetableEntry> entryList, Export exportConfiguration);
 }

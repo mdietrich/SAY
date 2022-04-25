@@ -7,5 +7,5 @@ import de.mdietrich.say.entity.say.SayTimetableImportRow;
 
 public interface ConsolidatorInterface {
 
-	public SayTimetable consolidate(List<SayTimetableImportRow> importRowList);
+	SayTimetable consolidate(List<SayTimetableImportRow> importRowList);
 }

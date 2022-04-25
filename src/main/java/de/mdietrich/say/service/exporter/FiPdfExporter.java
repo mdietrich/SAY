@@ -45,9 +45,9 @@ public class FiPdfExporter implements ExporterInterface {
 	@Autowired
 	private ConfigService configService;
 
-	private String inPath = "export/in/";
-	private String outPath = "export/out/";
-	private String xmlFilename = "data.xml";
+	private final String inPath = "export/in/";
+	private final String outPath = "export/out/";
+	private final String xmlFilename = "data.xml";
 
 	// 01 = Arbeitszeit, 02 = Bereitschaftszeit, 03 = Reisezeit Hinfahrt, 04 =
 	// Reisezeit Rückfahrt, 05 = Zeile gelöscht
@@ -76,8 +76,7 @@ public class FiPdfExporter implements ExporterInterface {
 
 	private BigDecimal minutesToDay(int minutes) {
 		BigDecimal dailyHours = new BigDecimal(this.configService.getConfig().getDailyHours());
-		BigDecimal hours = new BigDecimal(minutes).divide(new BigDecimal(60), 3, RoundingMode.HALF_UP).divide(dailyHours, 3, RoundingMode.HALF_UP);
-		return hours;
+		return new BigDecimal(minutes).divide(new BigDecimal(60), 3, RoundingMode.HALF_UP).divide(dailyHours, 3, RoundingMode.HALF_UP);
 	}
 
 	private String fixRemark(String remark) {
@@ -94,28 +93,28 @@ public class FiPdfExporter implements ExporterInterface {
 		String year = dayArray[0];
 		String month = dayArray[1];
 
-		String dailyEntry = "            <DATA>\n"
-				+ "                <VERGUETUNGSART>%VERGUETUNGSART%</VERGUETUNGSART>\n"
-				+ "                <MONAT>%MONAT%</MONAT>\n"
-				+ "                <WOCHENTAG>%WOCHENTAG%</WOCHENTAG>\n"
-				+ "                <FEIERTAG>%FEIERTAG%</FEIERTAG>\n"
-				+ "                <ZEIT_VON>%ZEIT_VON%</ZEIT_VON>\n"
-				+ "                <ZEIT_BIS>%ZEIT_BIS%</ZEIT_BIS>\n"
-				+ "                <PAUSE>%PAUSE%</PAUSE>\n"
-				+ "                <DESCRIPTION>%DESCRIPTION%</DESCRIPTION>\n"
-				+ "                <ERFASSTEZEIT>%ERFASSTEZEIT%</ERFASSTEZEIT>\n"
-				+ "                <ANERKANNTEZEIT>%ANERKANNTEZEIT%</ANERKANNTEZEIT><EINHEIT/>\n"
-				+ "                <ZUSCHLAG_NACHT>%ZUSCHLAG_NACHT%</ZUSCHLAG_NACHT>\n"
-				+ "                <ZUSCHLAG_SA>%ZUSCHLAG_SA%</ZUSCHLAG_SA>\n"
-				+ "                <ZUSCHLAG_SO>%ZUSCHLAG_SO%</ZUSCHLAG_SO>\n"
-				+ "                <ZUSCHLAG_FEIERT>%ZUSCHLAG_FEIERT%</ZUSCHLAG_FEIERT>\n"
-				+ "                <ZUSCHLAG_GESAMT>%ZUSCHLAG_GESAMT%</ZUSCHLAG_GESAMT>\n"
-				+ "                <BEREIT_WERKTAG>0.000</BEREIT_WERKTAG>\n"
-				+ "                <BEREIT_SA>0.000</BEREIT_SA>\n"
-				+ "                <BEREIT_SO>0.000</BEREIT_SO>\n"
-				+ "                <BEREIT_GESAMT>0.000</BEREIT_GESAMT>\n"
-				+ "            </DATA>";
-
+		String dailyEntry = """
+				<DATA>
+				    <VERGUETUNGSART>%VERGUETUNGSART%</VERGUETUNGSART>
+				    <MONAT>%MONAT%</MONAT>
+				    <WOCHENTAG>%WOCHENTAG%</WOCHENTAG>
+				    <FEIERTAG>%FEIERTAG%</FEIERTAG>
+				    <ZEIT_VON>%ZEIT_VON%</ZEIT_VON>
+				    <ZEIT_BIS>%ZEIT_BIS%</ZEIT_BIS>
+				    <PAUSE>%PAUSE%</PAUSE>
+				    <DESCRIPTION>%DESCRIPTION%</DESCRIPTION>
+				    <ERFASSTEZEIT>%ERFASSTEZEIT%</ERFASSTEZEIT>
+				    <ANERKANNTEZEIT>%ANERKANNTEZEIT%</ANERKANNTEZEIT><EINHEIT/>
+				    <ZUSCHLAG_NACHT>%ZUSCHLAG_NACHT%</ZUSCHLAG_NACHT>
+				    <ZUSCHLAG_SA>%ZUSCHLAG_SA%</ZUSCHLAG_SA>
+				    <ZUSCHLAG_SO>%ZUSCHLAG_SO%</ZUSCHLAG_SO>
+				    <ZUSCHLAG_FEIERT>%ZUSCHLAG_FEIERT%</ZUSCHLAG_FEIERT>
+				    <ZUSCHLAG_GESAMT>%ZUSCHLAG_GESAMT%</ZUSCHLAG_GESAMT>
+				    <BEREIT_WERKTAG>0.000</BEREIT_WERKTAG>
+				    <BEREIT_SA>0.000</BEREIT_SA>
+				    <BEREIT_SO>0.000</BEREIT_SO>
+				    <BEREIT_GESAMT>0.000</BEREIT_GESAMT>
+				</DATA>""".indent(12);
 
 		xml = xml.replaceAll("%MONAT%", month);
 		xml = xml.replaceAll("%JAHR%", year);
@@ -135,13 +134,13 @@ public class FiPdfExporter implements ExporterInterface {
 		BigDecimal bonusHolidayTotal = new BigDecimal(0); // also contains sundays
 		BigDecimal bonusTotalTotal = new BigDecimal(0);
 
-		String dailyEntriesXml = "";
+		StringBuilder dailyEntriesXml = new StringBuilder();
 		for (TimetableEntry timetableEntry : timetableEntryList) {
 			String dailyXml = dailyEntry;
 
 			// prepare data
 			String day = timetableEntry.getDay().substring(8, 10);
-			String dayOfWeek = "0" + LocalDate.of(Integer.valueOf(year), Month.of(Integer.valueOf(month)), Integer.valueOf(day)).getDayOfWeek().getValue();
+			String dayOfWeek = "0" + LocalDate.of(Integer.parseInt(year), Month.of(Integer.parseInt(month)), Integer.parseInt(day)).getDayOfWeek().getValue();
 			// this should be changed to "Ja" during work on a holiday
 			String holiday = "Nein";
 			String timeFrom = timetableEntry.getTimeFrom().substring(11, 16);
@@ -190,9 +189,9 @@ public class FiPdfExporter implements ExporterInterface {
 			dailyXml = dailyXml.replaceAll("%BEREIT_SO%", toString(standbySunday, 3));
 			dailyXml = dailyXml.replaceAll("%BEREIT_GESAMT%", toString(standbyHoliday, 3));
 
-			dailyEntriesXml += dailyXml;
+			dailyEntriesXml.append(dailyXml);
 		}
-		xml = xml.replaceAll("%EINGABETAG_DATA%", dailyEntriesXml);
+		xml = xml.replaceAll("%EINGABETAG_DATA%", dailyEntriesXml.toString());
 
 		xml = xml.replaceAll("%GESAMT_ARBEIT%", toString(totalApproved, 3));
 		xml = xml.replaceAll("%GESAMT_ZUSCHLAG%", toString(bonusTotalTotal, 3));
@@ -262,14 +261,12 @@ public class FiPdfExporter implements ExporterInterface {
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error("Could not write temporary xml file " + filename);
-			return;
 		}
 	}
 
 	private String buildExportPath(String date, String filename) {
-		filename = filename.substring(0, filename.length() - 4);
-		String path = this.outPath + date.substring(0, 7) + "_" + filename + "_" + LocalDate.now().toString() + ".pdf";
-		return path;
+		String plainFilename = filename.substring(0, filename.length() - 4);
+		return this.outPath + date.substring(0, 7) + "_" + plainFilename + "_" + LocalDate.now() + ".pdf";
 	}
 
 	private void writeExport(String date, Export exportConfiguration) {
@@ -292,7 +289,7 @@ public class FiPdfExporter implements ExporterInterface {
 		xmlFile.delete();
 	}
 
-	public void fillXmlInPdf(File xmlFile, File inputPdf, File outputPdf) throws IOException, DocumentException, FileNotFoundException {
+	public void fillXmlInPdf(File xmlFile, File inputPdf, File outputPdf) throws IOException, DocumentException {
 		PdfStamper stamper = null;
 		try {
 			PdfReader reader = new PdfReader(inputPdf.getAbsolutePath());
@@ -305,7 +302,9 @@ public class FiPdfExporter implements ExporterInterface {
 			e.printStackTrace();
 		} finally {
 			try {
-				stamper.close();
+				if(stamper != null) {
+					stamper.close();
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

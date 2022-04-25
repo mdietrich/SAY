@@ -27,10 +27,11 @@ public class ShellCommands {
 
 	@ShellMethod("Read information for configured user")
 	public String user() {
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		User user = sageService.getUserData();
-		result += "\nUserId " + user.getUserId() + " -  " + user.getEmployee().getFullname() + "\n";
-		return result;
+		result.append("\nUserId ").append(user.getUserId()).append(" -  ").append(user.getEmployee().getFullname())
+				.append("\n");
+		return result.toString();
 	}
 
 	@ShellMethod("Read projects for configured user")

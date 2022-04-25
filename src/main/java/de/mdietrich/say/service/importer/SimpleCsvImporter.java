@@ -58,8 +58,6 @@ public class SimpleCsvImporter implements CsvImporterInterface {
 				result.add(row);
 			}
 
-			System.out.print(result.toString());
-
 		} catch (IOException | CsvException e) {
 			e.printStackTrace();
 			logger.error("Error reading csv file " + filename);

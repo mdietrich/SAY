@@ -1,6 +1,7 @@
 package de.mdietrich.say.service.consolidator;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,26 +76,20 @@ public class AutoPauseConsolidator implements ConsolidatorInterface {
 		LocalTime t = timeService.timeStringToTime(time);
 
 		String[] hoursParts = hours.toString().split("[.]");
-		long hoursH = Long.valueOf(hoursParts[0]);
+		long hoursH = Long.parseLong(hoursParts[0]);
 		BigDecimal hoursMBigDecimal = hours.subtract(new BigDecimal(hoursH));
 		long hoursM = hoursMBigDecimal.multiply(new BigDecimal(60)).longValue();
 		t = t.plusHours(hoursH);
 		t = t.plusMinutes(hoursM);
-
-		String newTime = t.toString();
-
-		return newTime;
+		return t.toString();
 	}
 
 
 
 	private Boolean shouldHaveBreak(String begin, String end) {
 		String breakStart = this.configService.getConfig().getPauseStart();
-		if (timeService.isTimeABeforeTimeB(begin.substring(11, 16), breakStart)
-				&& timeService.isTimeABeforeTimeB(breakStart, end.substring(11, 16))) {
-			return true;
-		}
-		return false;
+		return timeService.isTimeABeforeTimeB(begin.substring(11, 16), breakStart)
+				&& timeService.isTimeABeforeTimeB(breakStart, end.substring(11, 16));
 	}
 
 	private SayTimetableEntry updateEntry(SayTimetableEntry existingEntry, SayTimetableEntry newEntry) {
@@ -130,7 +125,7 @@ public class AutoPauseConsolidator implements ConsolidatorInterface {
 		} else {
 			// existing day: check if project exists
 			List<SayTimetableEntry> entryList = this.sayTimetable.getDays().get(day);
-			Boolean projectExists = false;
+			boolean projectExists = false;
 			SayTimetableEntry existingEntry = null;
 			for (SayTimetableEntry sayTimetableEntry : entryList) {
 				if (sayTimetableEntry.getProjectId() == entry.getProjectId()) {
@@ -169,9 +164,9 @@ public class AutoPauseConsolidator implements ConsolidatorInterface {
 	}
 
 	private void addBreakForDayEntries(List<SayTimetableEntry> entries) {
-		Boolean dayHasBreak = false;
-		int breakDurationMinutes = Integer.valueOf(configService.getConfig().getPauseDuration());
-		BigDecimal breakDurationHours = new BigDecimal(breakDurationMinutes).divide(new BigDecimal(60));
+		boolean dayHasBreak = false;
+		int breakDurationMinutes = Integer.parseInt(configService.getConfig().getPauseDuration());
+		BigDecimal breakDurationHours = new BigDecimal(breakDurationMinutes).divide(new BigDecimal(60), 2, RoundingMode.HALF_UP);
 		String breakStart = this.configService.getConfig().getPauseStart();
 		for (SayTimetableEntry entry : entries) {
 			de.mdietrich.say.entity.configuration.Project projectConfig = this.configService.getConfig().getProjectForProjectId(entry.getProjectId());
