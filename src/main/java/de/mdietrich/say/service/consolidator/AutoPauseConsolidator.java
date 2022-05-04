@@ -189,7 +189,8 @@ public class AutoPauseConsolidator implements ConsolidatorInterface {
 					entry.setAmountHours(entry.getAmountHours().add(breakDurationHours));
 				}
 
-			} else {
+			}
+			if(dayHasBreak && entry.getBreakAmountMinutes() == 0){
 				// fix times of following project on that day after break
 				String begin = timeService.addHoursToDateTime(entry.getBegin(), breakDurationHours);
 				String end = timeService.addHoursToDateTime(entry.getEnd(), breakDurationHours);
@@ -210,11 +211,13 @@ public class AutoPauseConsolidator implements ConsolidatorInterface {
 
 			int projectId = this.getProjectIdByCompanyAndProject(row.getCompany(), row.getProject());
 			if (projectId == 0) {
+				logger.error(row.getDate() + " - " + row.getBegin() + ": Could not find project for company '" + row.getCompany()+ "' and project '" + row.getProject() + "'. Please check your csv and config.json.");
 				continue;
 			}
 
 			int activityId = this.getActivityIdByCompanyAndProject(row.getCompany(), row.getProject());
 			if (activityId == 0) {
+				logger.error(row.getDate() + " - " + row.getBegin() + ": Could not find activity for company '" + row.getCompany()+ "' and project '" + row.getProject() + "'. Please check your csv and config.json.");
 				continue;
 			}
 

@@ -220,7 +220,7 @@ Use this tool at your own risk. Make sure that your data gets imported and expor
 
 ## License
 
-Distributed under the MIT License. See LICENSE.txt for more information.
+Distributed under the MIT License. See LICENSE.txt for more information. However, additional restrictions may apply.
 
 Photo of Yak by <a href="https://unsplash.com/@oladybul">Ola Dybul</a> on <a href="https://unsplash.com/">Unsplash</a>
 

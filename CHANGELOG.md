@@ -1,6 +1,8 @@
 # Changelog
+
 ## 0.2
 ### Features
+* Fix for break calculation.
 * Added SimpleCsvImporter for generic CSV imports
 
 ### Fixes

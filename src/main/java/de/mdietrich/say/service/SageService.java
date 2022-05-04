@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
+import de.mdietrich.say.entity.sage.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -27,17 +28,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.mdietrich.say.entity.configuration.Export;
-import de.mdietrich.say.entity.sage.Break;
-import de.mdietrich.say.entity.sage.EmployeeKey;
-import de.mdietrich.say.entity.sage.LoginRequest;
-import de.mdietrich.say.entity.sage.PortalLoginForm;
-import de.mdietrich.say.entity.sage.Project;
-import de.mdietrich.say.entity.sage.ProjectTime;
-import de.mdietrich.say.entity.sage.ProjectUnit;
-import de.mdietrich.say.entity.sage.Timetable;
-import de.mdietrich.say.entity.sage.TimetableEntry;
-import de.mdietrich.say.entity.sage.TimetableRequest;
-import de.mdietrich.say.entity.sage.User;
 import de.mdietrich.say.entity.say.SayTimetable;
 import de.mdietrich.say.entity.say.SayTimetableEntry;
 import de.mdietrich.say.entity.say.SayTimetableImportRow;
@@ -502,14 +492,28 @@ public class SageService {
 			return false;
 		}
 		try {
+			logger.debug(json);
 			String html = requestService.putPage(url, BodyPublishers.ofString(json), 200, "application/json");
-			logger.debug(html);
+			logResult(html);
 		} catch (UnauthorizedException e1) {
 			this.loggedIn = false;
 			return this.addProjectTime(sayTimetableEntry);
 		}
-
 		return true;
+	}
+
+	private void logResult(String html) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+			Response response = objectMapper.readValue(html, Response.class);
+			if(response.getError() != null) {
+				logger.error(response.getError());
+				return;
+			}
+		} catch (JsonProcessingException e) {
+			logger.debug("Result is not in json format");
+		}
+		logger.debug(html);
 	}
 
 	/**
